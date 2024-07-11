@@ -1,0 +1,104 @@
+<?php
+
+namespace scheduler;
+
+use think\Console;
+use think\console\Input;
+use think\console\Output;
+use think\Exception;
+use think\ThinkScheduler\ExceptionScheduler;
+use think\ThinkScheduler\Scheduler;
+use think\ThinkScheduler\SchedulerInterface;
+use Throwable;
+
+/**
+ * Class CronConfig
+ */
+class CronConfig implements SchedulerInterface
+{
+
+    /**
+     * @var Scheduler
+     */
+    protected $scheduler;
+
+    /**
+     * @var Input
+     */
+    protected $input;
+
+    /**
+     * @var Output
+     */
+    protected $output;
+
+
+    /**
+     * 执行错误日志
+     * 可自定义重写
+     * @var string
+     */
+    public $errorLogPath = LOG_PATH . 'cron/cron-error.log';
+
+
+    /**
+     * @param Scheduler $scheduler
+     * @param Input $input
+     * @param Output $output
+     */
+    public function __construct(Scheduler $scheduler, Input $input, Output $output)
+    {
+        $this->scheduler = $scheduler;
+        $this->input = $input;
+        $this->output = $output;
+    }
+
+    /**
+     * Fixme: 配置cron任务
+     * @return void
+     * @throws Exception
+     */
+    public function cronConfig(): void
+    {
+        $this->scheduler->expression('*/2 * * * *')
+            ->call(function () {
+                $this->output->info(PHP_EOL . '===== callback --- 复杂逻辑调用类方法 Class::action() =====');
+            })
+            ->desc('任务描述')
+            ->save();
+
+        $this->scheduler->expression('*/2 * * * *')
+            ->call(function () {
+                $res = Console::call('list', ['-h'])->fetch();
+                $this->output->info(PHP_EOL . '===== callback --- 调用命令行 list, [-h] =====' . $res);
+            })
+            ->desc('任务描述2')
+            ->save();
+
+        $this->scheduler->expression('*/2 * * * *')
+            ->call(function () {
+                $this->output->info(PHP_EOL . '===== callback 单纯闭包编写简单逻辑 =====');
+            })
+            ->desc('任务描述3')
+            ->save();
+
+        $this->scheduler->expression('*/2 * * * *')
+            ->call(function () {
+                /**
+                 * Fixme: 1.多个任务执行时 某一任务出现错误或异常会写入日志 默认不会终止程序后续任务继续执行
+                 *        2. 如果想打断程序后续任务终止运行 可自己捕获异常 用 ExceptionScheduler 类抛出
+                 */
+                try {
+
+                    //处理逻辑
+
+                } catch (Throwable $exception) {
+                    throw new ExceptionScheduler('错误信息, 将会终止执行');
+                }
+
+            })
+            ->desc('任务描述4')
+            ->save();
+    }
+
+}
