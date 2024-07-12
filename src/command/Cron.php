@@ -47,7 +47,7 @@ class Cron extends Command
     protected function execute(Input $input, Output $output)
     {
         $status = $input->getArgument('status');
-        $path = ROOT_PATH . 'scheduler';
+        $path = APP_PATH . 'scheduler';
         $filename = 'CronConfig.php';
         $filePath = $path . DS . $filename;
         if ($status == 'init') {
@@ -62,10 +62,9 @@ class Cron extends Command
             return true;
         }
 
-        include $filePath;
-        $cronConfig = new \scheduler\CronConfig(new Scheduler(), $input, $output);
+        $cronConfig = new \app\scheduler\CronConfig(new Scheduler(), $input, $output);
         if (!$cronConfig instanceof SchedulerInterface) {
-            throw new ExceptionScheduler('\scheduler\CronConfig  must implement an interface class ' . SchedulerInterface::class);
+            throw new ExceptionScheduler('\app\scheduler\CronConfig  must implement an interface class ' . SchedulerInterface::class);
         }
         $cronConfig->cronConfig();
         if ($status == 'start') {

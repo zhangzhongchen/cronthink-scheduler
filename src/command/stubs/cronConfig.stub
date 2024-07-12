@@ -1,6 +1,6 @@
 <?php
 
-namespace scheduler;
+namespace app\scheduler;
 
 use think\Console;
 use think\console\Input;

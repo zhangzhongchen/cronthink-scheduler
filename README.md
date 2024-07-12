@@ -22,14 +22,14 @@ php >=7.1
 ```
 php think cron init
 ```
-执行命令后会在项目根目录下生成样例文件  `根目录/scheduler/CronConfig.php`
+执行命令后会在项目根目录下生成样例文件  `(应用目录)application/scheduler/CronConfig.php`
 
 ```
 
 
 <?php
 
-namespace scheduler;
+namespace app\scheduler;
 
 use think\Console;
 use think\console\Input;
@@ -114,7 +114,7 @@ class CronConfig implements SchedulerInterface
         $this->scheduler->expression('*/2 * * * *')
             ->call(function () {
                 /**
-                 * Fixme: 1.多个任务执行时 某一任务出现错误或异常会写入日志 默认不会终止程序后续任务继续执行
+                 * Fixme: 1. 多个任务执行时 某一任务出现错误或异常会写入日志 默认不会终止程序后续任务继续执行
                  *        2. 如果想打断程序后续任务终止运行 可自己捕获异常 用 ExceptionScheduler 类抛出
                  */
                 try {
